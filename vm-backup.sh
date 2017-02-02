@@ -5,7 +5,7 @@ BACKUP_USING_NAMES=1
 MAX_WAIT_TIME=100
 BACKUPROOT="/mnt/vmbackup/"
 
-declare -a machine_uuids=("00000000-0000-0000-0000-000000000000",
+declare -a machine_uuids=("00000000-0000-0000-0000-000000000000"
                           "00000000-0000-0000-0000-000000000000")
 
 #Backup Script
@@ -27,7 +27,6 @@ do
             sleep 1
             STATUS=`xe vm-param-get param-name=power-state uuid=$machine_uuid`
             TIMEOUT=$((TIMEOUT+1))
-            echo "TEST: $STATUS"
             if [ $TIMEOUT -gt $MAX_WAIT_TIME ] 
             then
                 echo "Backup failed!"
