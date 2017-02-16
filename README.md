@@ -6,7 +6,7 @@ Bash script for backing up VM's from a XenServer.
 
 #### Files
 * `vm-backup.sh` - Performs backups on the VM host machine. Written and tested with XenServer 6.5, 7.0
-* `compose-vm-report.php` - Converts the log from this cron to a viewable success/fail report with durations.` - Converts the log from this cron to a viewable success/fail report with durations.
+* `compose-vm-report.php` - Converts the log from this cron to a viewable success/fail report with durations.
 
 #### Settings
 
