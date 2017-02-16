@@ -4,6 +4,12 @@ Bash script for backing up VM's from a XenServer.
 * Tested on a single-host personal environment.
 * Designed to be run as a cron by the Xen hosts' root user.
 
+#### Files
+* `vm-backup.sh` - Performs backups on the VM host machine. Written and tested with XenServer 6.5, 7.0
+* `compose-vm-report#### Files
+* `vm-backup.sh` - Performs backups on the VM host machine. Written and tested with XenServer 6.5, 7.0
+* `compose-vm-report.php` - Converts the log from this cron to a viewable success/fail report with durations.` - Converts the log from this cron to a viewable success/fail report with durations.
+
 #### Settings
 
 * `BACKUP_USING_NAMES` If set to 1 will save the backups as the Name of the virtual machine. If 0 will save as the machine's UUID.
