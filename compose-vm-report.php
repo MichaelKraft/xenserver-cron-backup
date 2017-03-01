@@ -1,14 +1,12 @@
 <?php
 
 // Settings
-$loglocation = '/home/michael/scripts/backup.log';
-$outputlocation = '/home/michael/scripts/backup.report';
+$loglocation = 'backup.log';
+$outputlocation = 'backup.report';
 
 class VM {
         public $name;
-        public $stopped = false;
         public $exported = false;
-        public $started = false;
         public $duration;
 }
 
@@ -22,12 +20,10 @@ foreach ($vmlogs as $key => $vmlog) {
         if(count($logitems) > 0) {
                 $vm = new VM;
 
-                $vm->name = str_replace('Stopping ', '', str_replace('...', '', $logitems[0]));
-                $vm->stopped = strpos($logitems[1], 'Stopped.') !== false;
-                $vm->exported = strpos($logitems[3], 'succeeded') !== false;
-                $vm->started = strpos($logitems[6], 'started.') !== false;
+                $vm->name = str_replace('Snapshotting ', '', str_replace('...', '', $logitems[0]));
+                $vm->exported = strpos($logitems[4], 'Completed') !== false;
 
-                if($vm->stopped && $vm->exported && $vm->started) {
+                if($vm->exported) {
                         date_default_timezone_set('America/Chicago');
                         $start = strtotime($logitems[2]);
                         $end = strtotime($logitems[5]);
@@ -49,7 +45,7 @@ if(count($vmrecords) > 0) {
         foreach ($vmrecords as $vm) {
                 $output = $output . "<tr>";
                 $output = $output . "<td>$vm->name</td>";
-                if($vm->stopped && $vm->exported && $vm->started) {
+                if($vm->exported) {
                         $output = $output . '<td><span style="color:#008f13;"><center>✓</center></span></td>';
                         $output = $output . '<td>' . $vm->duration . '</td>';
                 } else {

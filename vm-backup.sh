@@ -8,61 +8,28 @@ BACKUPROOT="/mnt/vmbackup/"
 declare -a machine_uuids=("00000000-0000-0000-0000-000000000000"
                           "00000000-0000-0000-0000-000000000000")
 
-for machine_uuid in "${machine_uuids[@]}"
-do  
-    if [ $BACKUP_USING_NAMES == 1 ]
-    then
-        NAME=`xe vm-param-get param-name=name-label uuid=$machine_uuid`
-    else
-        NAME=$machine_uuid
-    fi
+for MACHINE_UUID in "${MACHINE_UUIDS[@]}"
+do
+	if [ $BACKUP_USING_NAMES == 1 ]
+	then
+		NAME=`xe vm-param-get param-name=name-label uuid=$MACHINE_UUID`
+	else
+		NAME=$MACHINE_UUID
+	fi
+	echo "Snapshotting $NAME..."
+	SNAPSHOT=`xe vm-snapshot vm=$MACHINE_UUID new-name-label=backup`
 
-    echo "Stopping $NAME..."
-    xe vm-shutdown uuid=$machine_uuid
+	echo "Rotating backups..."
+	rm $BACKUPROOT$NAME.xva.1 
+	mv $BACKUPROOT$NAME.xva.0 $BACKUPROOT$NAME.xva.1
+	mv $BACKUPROOT$NAME.xva $BACKUPROOT$NAME.xva.0
 
-    TIMEOUT=0
-    STATUS="running"
-    while [ $STATUS != "halted" ]; do
-        sleep 1
-        STATUS=`xe vm-param-get param-name=power-state uuid=$machine_uuid`
-        TIMEOUT=$((TIMEOUT+1))
-        if [ $TIMEOUT -gt $MAX_WAIT_TIME ]
-        then
-            echo "Backup failed!"
-            echo "Could not stop VM: $NAME"
-            echo "ID: $machine_uuid"
-        fi
-    done
+	echo "Exporting snapshot of $NAME..."
+	SNAPSHOT_TEMPLATE=`xe template-param-set is-a-template=false uuid=$SNAPSHOT`
+        snapshot_export=`xe vm-export vm=$SNAPSHOT filename="$BACKUPROOT$NAME.xva"`
+        snapshot_delete=`xe vm-uninstall uuid=$SNAPSHOT force=true`
 
-    if [ $STATUS == "halted" ]
-    then
-        echo "Stopped. Beginning backup..."
-        date
-
-        rm $BACKUPROOT$NAME.xva.1
-        mv $BACKUPROOT$NAME.xva.0 $BACKUPROOT$NAME.xva.1
-        mv $BACKUPROOT$NAME.xva $BACKUPROOT$NAME.xva.0
-
-        xe vm-export vm=$NAME filename=$BACKUPROOT$NAME.xva
-
-        echo "Completed backup of $NAME."
-        date
-
-        xe vm-start uuid=$machine_uuid
-        STATUS="halted"
-        TIMEOUT=0
-        while [ $STATUS != "running" ]; do
-            sleep 1
-            STATUS=`xe vm-param-get param-name=power-state uuid=$machine_uuid`
-            TIMEOUT=$((TIMEOUT+1))
-            if [ $TIMEOUT -gt $MAX_WAIT_TIME ]
-            then
-                echo "Backup succeeded!"
-                echo "Could not start VM: $NAME"
-                echo "ID: $machine_uuid"
-            fi
-        done
-        echo "$NAME started."
-    fi
-    echo "---"
+        echo "Completed $NAME backup."
+	echo "---"
 done
+
