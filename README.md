@@ -3,17 +3,18 @@ Bash script for backing up VM's from a XenServer.
 
 * Tested on a single-host personal environment.
 * Designed to be run as a cron by the Xen hosts' root user.
+* Now fetches UUIDs of all virtual machines (excludes domain control VM and templates)
 
 #### Files
 * `vm-backup.sh` - Performs backups on the VM host machine. Written and tested with XenServer 6.5, 7.0
 * `compose-vm-report.php` - Converts the log from this cron to a viewable success/fail report with durations.
+* `rotation.txt` - Stores an integer used for rotations. Script increments the value on run, then resets after max rotations have been done.
 
 #### Settings
 
 * `BACKUP_USING_NAMES` If set to 1 will save the backups as the Name of the virtual machine. If 0 will save as the machine's UUID.
 * `MAX_WAIT_TIME` Number of seconds the script will wait to verify the machine is in the halted/running state before and after backup.
 * `BACKUPROOT` Directory in which to deposit .xva files.
-* `machine_uuids` Array of UUID's targeting the Virtual Machines to be backed up. Use `xe vm-list` to see them.
 
 #### To Do
 
